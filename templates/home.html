@@ -1,0 +1,107 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>KEM PDF · Tus PDF, en orden</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <script type="module" src="{% static 'js/app.js' %}" defer></script>
+</head>
+
+<body>
+    <aside class="sidebar"><a href="/" class="brand" aria-label="KEM PDF inicio"><img src="{% static 'img/logo.png' %}"
+                alt="KEM"></a>
+        <div class="nav-label">HERRAMIENTAS</div>
+        <nav><button class="nav-tool active" data-tool="merge"><span>▤</span> Unir PDF</button><button class="nav-tool"
+                data-tool="divide"><span>✂</span> Dividir PDF</button></nav>
+        <div class="privacy"><span class="privacy-icon">◇</span><strong>Privacidad primero</strong>
+            <p>Procesamiento en tu servidor Django. Los archivos temporales se eliminan al finalizar la descarga.</p>
+        </div>
+    </aside>
+    <div class="workspace">
+        <header>
+            <div>KEM <span class="crumb">›</span> <strong>Herramientas PDF</strong></div>
+            <div class="server-badge"><i></i> Procesamiento en Django</div><span class="avatar">K</span>
+        </header>
+        <main>
+            <div class="eyebrow">GESTIÓN DE DOCUMENTOS</div>
+            <h1>Tus PDF, en orden.</h1>
+            <p class="subtitle">Menos pasos. Más orden. Elige una herramienta para empezar.</p>
+            <div class="tabs" role="group" aria-label="Herramienta"><button class="active" data-tool="merge">▤ &nbsp;
+                    Unir PDF</button><button data-tool="divide">✂ &nbsp; Dividir PDF</button></div>
+            <form id="pdf-form" data-file-limit="{{ max_file_mb }}" data-total-limit="{{ max_total_mb }}"
+                action="{% url 'process' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
+                <div class="panels">
+                    <section class="card files-card">
+                        <h2 id="panel-title">Archivos para unir</h2>
+                        <p class="muted" id="panel-description">Añade dos o más archivos PDF y ordénalos como prefieras.
+                        </p>
+                        <label class="dropzone" id="dropzone" for="file-input"><span
+                                class="upload-icon">⇧</span><strong>Arrastra tus PDF aquí</strong><span>o <b>selecciona
+                                    archivos</b> desde tu dispositivo</span><input id="file-input" name="files"
+                                type="file" accept=".pdf,application/pdf" multiple></label>
+                        <div class="list-heading"><strong id="file-count">Ningún archivo seleccionado</strong><button
+                                type="button" class="text-button" id="clear">Quitar todos</button></div>
+                        <ul id="file-list" aria-label="Archivos seleccionados"></ul>
+                        <div id="empty"><span>▤</span>
+                            <p>Tu próximo documento empieza aquí.</p><small>Añade tus PDF para comenzar.</small>
+                        </div>
+                        <fieldset id="split-options" hidden>
+                            <legend>¿Cómo quieres dividirlo?</legend><label class="radio-option"><input type="radio"
+                                    name="split-mode" value="extract" checked><span><strong>Extraer páginas o
+                                        rangos</strong><small>Genera un único PDF con tu
+                                        selección.</small></span></label><label for="pages" class="range-label">Páginas
+                                que quieres extraer</label><input id="pages" type="text" placeholder="Ej.: 1,3,5-8"
+                                maxlength="10000" aria-describedby="range-help"><small id="range-help">Empieza en 1. Se
+                                conserva el orden indicado, incluidas las repeticiones.</small><label
+                                class="radio-option"><input type="radio" name="split-mode"
+                                    value="split"><span><strong>Un PDF por página</strong><small>Descarga todas las
+                                        páginas en un archivo ZIP.</small></span></label>
+                        </fieldset>
+                        <p class="limits">Límite: {{ max_file_mb }} MB por archivo · {{ max_total_mb }} MB por
+                            operación<br>Hasta 30 archivos y 2.000 páginas por operación.</p>
+                    </section>
+                    <aside class="card summary">
+                        <h2>Resumen</h2>
+                        <p class="muted">Antes de crear tu documento</p>
+                        <dl>
+                            <div>
+                                <dt>ARCHIVOS</dt>
+                                <dd id="summary-files">0 PDF</dd>
+                            </div>
+                            <div>
+                                <dt>PÁGINAS TOTALES</dt>
+                                <dd id="summary-pages">—</dd>
+                            </div>
+                            <div>
+                                <dt>TAMAÑO DE ENTRADA</dt>
+                                <dd id="summary-size">0 MB</dd>
+                            </div>
+                        </dl>
+                        <div class="ready"><span>✓</span>
+                            <div><strong id="ready-title">Todo comienza con tus PDF</strong>
+                                <p id="ready-detail">Selecciona documentos para continuar.</p>
+                            </div>
+                        </div><button class="primary" id="submit" type="submit" disabled>Unir archivos
+                            <span>→</span></button>
+                        <p class="download-note">El resultado se descargará<br>directamente en tu dispositivo.</p>
+                        <div id="status" role="status" aria-live="polite"></div>
+                        <div class="tip"><strong>Una herramienta para cada tarea</strong>
+                            <p>Une varios documentos o separa solo las páginas que necesitas.</p><button type="button"
+                                class="text-button" id="switch-tool">Ir a Dividir PDF →</button>
+                        </div>
+                    </aside>
+                </div>
+            </form>
+            <footer><span>KEM PDF · Herramientas sencillas para tus documentos</span><span>Hecho para
+                    simplificar.</span></footer>
+        </main>
+    </div>
+    <noscript>
+        <div class="noscript">Activa JavaScript para seleccionar, ordenar y procesar tus PDF.</div>
+    </noscript>
+</body>
+
+</html>

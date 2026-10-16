@@ -1,0 +1,6 @@
+{
+  "name": "kem-pdf",
+  "private": true,
+  "scripts": {"build": "tsc", "watch": "tsc --watch", "check": "tsc --noEmit"},
+  "devDependencies": {"typescript": "^6.0.0"}
+}
