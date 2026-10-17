@@ -1,6 +1,9 @@
-# KEM PDF
+<p align="center">
+	<img src="./static/img/logo-sin-fondo-redux.png">
+</p>
 
-Aplicación local con Django + pypdf, HTML, CSS y TypeScript puro. Diseño basado en `ux-preview.svg` y `logo.png`.
+
+Herramientas PDF de código abierto, con procesamiento local hecho en Django + pypdf, HTML, CSS y TypeScript puro. Diseño basado en `ux-preview.svg` y `logo.png`.
 
 ## Ejecutar en PowerShell
 
