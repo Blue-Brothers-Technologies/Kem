@@ -3,25 +3,26 @@
 </p>
 
 
-Herramientas PDF de código abierto, con procesamiento local hecho en Django + pypdf, HTML, CSS y TypeScript puro. Diseño basado en `ux-preview.svg` y `logo.png`.
+Herramientas PDF de código abierto, con procesamiento local hecho en Django + pypdf, HTML, CSS y TypeScript puro. El diseño del logo esta inspirado en un huaco mochica.
 
 ## Ejecutar en PowerShell
 
-Reutiliza el entorno `.venv` existente:
-
 ```powershell
+# Cargamos el proyecto de github
+# En la terminal creamos una carpeta virtual
+python -m venv .venv
 # Setup de aplicación
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 npm ci
 npm run build
-# Correr Applicación
+# Corremos Applicación
 python manage.py runserver
 ```
 
 Abre http://127.0.0.1:8000/. Si no puedes activar el entorno, usa `.\.venv\Scripts\python.exe` en lugar de `python`.
 
-Las dependencias ya se han instalado y `static/js/app.js` contiene la compilación. Para arrancar ahora basta `.\.venv\Scripts\python.exe manage.py runserver`. Node/npm solo se necesitan para instalar o compilar TypeScript. No hay base de datos ni migraciones en esta versión.
+Las dependencias ya se han instalado y `static/js/app.js` contiene la compilación. Para arrancar ahora basta `.\.venv\Scripts\python.exe manage.py runserver`. Node/npm solo se necesitan para instalar o compilar TypeScript.
 
 ## Uso
 
@@ -44,7 +45,12 @@ python manage.py check
 python manage.py test
 ```
 
-Archivos principales: `frontend/app.ts`, `templates/home.html`, `static/css/app.css`, `pdf_tools/views.py` y `pdf_tools/services.py`.
+Archivos principales: 
+- `frontend/app.ts`
+- `templates/home.html`
+- `static/css/app.css`
+- `pdf_tools/views.py`
+- `pdf_tools/services.py`
 
 ## Límites y archivos temporales
 
