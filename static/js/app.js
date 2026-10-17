@@ -9,10 +9,12 @@ let tool = "merge";
 let entries = [];
 let busy = false;
 const megabytes = (bytes) => `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+// Muestra un mensaje de progreso, éxito o error en el panel de resumen.
 function status(message, error = false) {
     statusBox.textContent = message;
     statusBox.className = error ? "error" : "success";
 }
+// Actualiza la lista de archivos, los totales y los controles según el estado actual.
 function render() {
     const list = el("file-list");
     list.replaceChildren();
@@ -67,6 +69,7 @@ function render() {
     form.querySelectorAll("[name=split-mode]").forEach(r => r.disabled = busy);
     pagesInput.disabled = busy || mode === "split";
 }
+// Cambia entre Unir y Dividir y limpia los archivos de la selección anterior.
 function selectTool(next) {
     if (busy || tool === next)
         return;
@@ -82,6 +85,7 @@ function selectTool(next) {
     el("switch-tool").textContent = tool === "merge" ? "Ir a Dividir PDF →" : "Ir a Unir PDF →";
     render();
 }
+// Valida cantidad, extensión y tamaño antes de enviar los PDF a Django para inspección.
 async function addFiles(files) {
     if (busy)
         return;
@@ -101,7 +105,7 @@ async function addFiles(files) {
     const added = files.map(file => ({ file }));
     entries.push(...added);
     render();
-    // Sequential requests avoid holding several large uploads in memory at once.
+    // Inspecciona los archivos de este lote uno a uno para evitar cargas simultáneas.
     for (const entry of added) {
         if (!entries.includes(entry))
             continue;
@@ -120,18 +124,23 @@ async function addFiles(files) {
         render();
     }
 }
+// Añade los archivos del selector y lo reinicia para permitir seleccionar el mismo otra vez.
 input.addEventListener("change", () => { void addFiles(Array.from(input.files ?? [])); input.value = ""; });
+// Gestiona el arrastre de archivos y reutiliza la validación del selector.
 const dropzone = el("dropzone");
-dropzone.addEventListener("dragover", event => {
-    event.preventDefault(); if (!busy)
-        dropzone.classList.add("over");
-});
+dropzone.addEventListener("dragover", event => { event.preventDefault(); if (!busy)
+    dropzone.classList.add("over"); });
 dropzone.addEventListener("dragleave", () => dropzone.classList.remove("over"));
 dropzone.addEventListener("drop", event => { event.preventDefault(); dropzone.classList.remove("over"); void addFiles(Array.from(event.dataTransfer?.files ?? [])); });
+// Conecta los botones del menú y las pestañas con la herramienta correspondiente.
 document.querySelectorAll("[data-tool]").forEach(b => b.addEventListener("click", () => selectTool(b.dataset.tool)));
+// Abre la otra herramienta desde el enlace del panel de resumen.
 el("switch-tool").addEventListener("click", () => selectTool(tool === "merge" ? "divide" : "merge"));
+// Vacía la selección y elimina el mensaje anterior.
 el("clear").addEventListener("click", () => { entries = []; status(""); render(); });
+// Ajusta el formulario al elegir extracción de rangos o un PDF por página.
 form.querySelectorAll("[name=split-mode]").forEach(r => r.addEventListener("change", render));
+// Envía los PDF a Django sin recargar la página y descarga el PDF o ZIP resultante.
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (busy || submit.disabled)
@@ -175,5 +184,6 @@ form.addEventListener("submit", async (event) => {
         render();
     }
 });
+// Inicializa la interfaz sin documentos seleccionados.
 render();
-export { };
+export {};

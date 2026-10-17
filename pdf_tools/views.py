@@ -1,12 +1,16 @@
+"""Atender la interfaz, la inspección y las descargas de documentos PDF."""
+
 import logging
 from shutil import copyfileobj
 from tempfile import SpooledTemporaryFile
 from zipfile import ZipFile, ZIP_DEFLATED
+
 from django.conf import settings
 from django.http import FileResponse, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 from pypdf import PdfWriter
+
 from .services import PDFError, parse_pages, read_pdf
 
 logger = logging.getLogger(__name__)
@@ -14,11 +18,13 @@ logger = logging.getLogger(__name__)
 
 @require_GET
 def home(request):
+    """Mostrar la página principal con los límites de carga configurados."""
     return render(request, "home.html", {"max_file_mb": settings.PDF_MAX_FILE_MB, "max_total_mb": settings.PDF_MAX_TOTAL_MB})
 
 
 @require_POST
 def inspect_pdf(request):
+    """Devolver el número de páginas o un error de validación en JSON."""
     try:
         files = request.FILES.getlist("files")
         if len(files) != 1:
@@ -30,6 +36,12 @@ def inspect_pdf(request):
 
 @require_POST
 def process(request):
+    """Procesar los PDF cargados y devolver un PDF o ZIP descargable.
+
+    Admitir unión, extracción de páginas y separación de todas las páginas.
+    Devolver los errores como JSON con estado HTTP 400 y cerrar el archivo
+    de salida si no se puede completar la operación.
+    """
     output = None
     try:
         action = request.POST.get("action")
@@ -50,10 +62,13 @@ def process(request):
         if sum(len(r.pages) for r in readers) > settings.PDF_MAX_PAGES:
             raise PDFError(
                 f"Procesa como máximo {settings.PDF_MAX_PAGES} páginas por operación.")
+        # Pasar a disco si el resultado supera el umbral de memoria de 8 MB.
         output = SpooledTemporaryFile(max_size=8 * 1024 * 1024, mode="w+b")
         if action == "split":
             with ZipFile(output, "w", ZIP_DEFLATED) as archive:
                 for index, page in enumerate(readers[0].pages, 1):
+                    # pypdf requiere un archivo posicionable antes de crear
+                    # la entrada correspondiente en el ZIP.
                     with SpooledTemporaryFile(max_size=8 * 1024 * 1024, mode="w+b") as page_buffer:
                         writer = PdfWriter()
                         writer.add_page(page)
@@ -77,6 +92,7 @@ def process(request):
             filename = "kem-unido.pdf" if action == "merge" else "kem-extraido.pdf"
             content_type = "application/pdf"
         output.seek(0)
+        # FileResponse asume el cierre del temporal al finalizar la respuesta.
         response = FileResponse(
             output, as_attachment=True, filename=filename, content_type=content_type)
         response["Cache-Control"] = "no-store"

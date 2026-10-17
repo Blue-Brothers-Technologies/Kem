@@ -1,3 +1,5 @@
+"""Ejecutar los comandos de administración de Django para KEM PDF."""
+
 import os
 import sys
 
